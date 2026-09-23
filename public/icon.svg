@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background — square so the OS applies its own corner treatment -->
+  <rect width="512" height="512" fill="#13151c"/>
+  <!-- Letter R as pure geometry (no fonts needed) -->
+  <g fill="#ffffff">
+    <!-- Vertical stem -->
+    <rect x="90" y="60" width="90" height="400"/>
+    <!-- Bump top bar -->
+    <rect x="90" y="60" width="235" height="85"/>
+    <!-- Bump right side -->
+    <rect x="300" y="60" width="90" height="260"/>
+    <!-- Crossbar (middle bar) -->
+    <rect x="90" y="235" width="235" height="85"/>
+    <!-- Diagonal leg -->
+    <polygon points="285,320 385,320 460,460 360,460"/>
+  </g>
+</svg>

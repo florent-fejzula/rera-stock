@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Product photos, uploaded by the Stock App at products/{productId}.jpg.
+    // Direct read/write through the SDK or console stays staff/admin-only,
+    // same as the `products` Firestore collection. The marketing website
+    // never talks to Storage directly — it only ever uses the download URL
+    // already stored on `public_products`, and Firebase's download-URL
+    // tokens work regardless of this rule once minted (that's what makes
+    // product photos visible on the public site).
+    match /products/{fileName} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

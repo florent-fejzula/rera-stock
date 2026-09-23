@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.firebase/
+*.local
+
+# Editor/OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*

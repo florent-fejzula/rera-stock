@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthed() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Every logged-in user can read their own profile (app needs this to load the role).
+    // Only admins can create/update user documents (to assign roles).
+    match /users/{uid} {
+      allow read: if isAuthed() && request.auth.uid == uid;
+      allow write: if isAdmin();
+    }
+
+    // Products: all authenticated users (admin + staff) can read and write.
+    // Holds price + stock qty — never exposed publicly. The public website
+    // reads `public_products` instead (see below).
+    match /products/{productId} {
+      allow read, write: if isAuthed();
+    }
+
+    // Sales: any authenticated user can record a sale (create).
+    // Only admins can read the sales history or delete records.
+    match /sales/{saleId} {
+      allow create: if isAuthed();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Categories: just names, nothing sensitive — public can read (the
+    // marketing site's filter bar is built from this). Any signed-in user
+    // (admin or staff) can manage them, same as products.
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAuthed();
+    }
+
+    // Public-safe mirror of `products`: name/category/image only, written by
+    // the app itself (see Stock.jsx saveProduct/removeProduct) whenever a
+    // product is added, edited, or deleted. This is what the marketing
+    // website reads — it never touches `products` directly.
+    match /public_products/{productId} {
+      allow read: if true;
+      allow write: if isAuthed();
+    }
+  }
+}

@@ -1,0 +1,145 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #f4f5f7; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+#root { min-height: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+.chip-scroll::-webkit-scrollbar { display: none; }
+.sheet { animation: slideUp .28s cubic-bezier(.16,1,.3,1); }
+.dialog { animation: fadeScale .2s cubic-bezier(.16,1,.3,1); }
+.mobile-drawer { animation: slideInLeft .26s cubic-bezier(.16,1,.3,1); }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeScale { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+button:active { transform: scale(.96); transition: transform .1s; }
+input:focus, select:focus, textarea:focus { border-color: #13151c !important; outline: none; }
+
+/* Mobile header — shown only on small screens */
+.mobile-header { display: block; }
+.mobile-fab { display: grid !important; }
+.desktop-add-btn { display: none !important; }
+.desktop-only { display: none !important; }
+.mobile-only { display: block !important; }
+
+/* Desktop overrides */
+@media (min-width: 768px) {
+  button:active { transform: none; }
+
+  .mobile-header { display: none; }
+  .mobile-fab { display: none !important; }
+  .desktop-add-btn { display: flex !important; }
+  .desktop-only { display: flex !important; }
+  .mobile-only { display: none !important; }
+
+  /* Sidebar layout */
+  .layout-root {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: #13151c;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    padding: 0;
+  }
+  .main-content {
+    margin-left: 240px;
+    flex: 1;
+    min-height: 100vh;
+    max-width: none;
+    background: #f4f5f7;
+  }
+
+  /* Stats row on desktop */
+  .stat-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    padding: 24px 28px 0 !important;
+  }
+  .stat-grid > div[style*="span 2"] {
+    grid-column: span 1 !important;
+  }
+
+  /* Product grid on desktop */
+  .product-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+    padding: 0 28px !important;
+  }
+
+  /* Toolbar on desktop */
+  .toolbar-wrap {
+    padding: 20px 28px 14px !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chip-row-wrap {
+    padding: 0 28px 16px !important;
+  }
+
+  /* Modal: centered dialog instead of bottom sheet */
+  .modal-overlay {
+    align-items: center !important;
+  }
+  .modal-sheet {
+    border-radius: 20px !important;
+    max-width: 520px !important;
+    max-height: 85vh !important;
+    margin: 20px !important;
+    width: calc(100% - 40px) !important;
+  }
+  .modal-grip { display: none; }
+  .confirm-box {
+    margin: 0 !important;
+    width: 340px;
+  }
+
+  /* Product modal: image fills the left column, fields on the right */
+  .product-modal-sheet { max-width: 760px !important; }
+  .product-modal-grid {
+    display: grid !important;
+    grid-template-columns: 260px 1fr !important;
+    gap: 24px !important;
+  }
+  .product-modal-image-col {
+    display: flex !important;
+    align-self: stretch;
+  }
+  .product-modal-image-btn {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 320px !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Sales table on desktop */
+  .sales-table { display: table !important; }
+  .sales-cards { display: none !important; }
+
+  /* Sales page desktop padding */
+  .sales-page-head { padding: 24px 28px 12px !important; }
+  .sales-filters-row { padding: 0 28px 16px !important; }
+  .sales-summary-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    padding: 0 28px 20px !important;
+  }
+  .sales-table-wrap { margin: 0 28px !important; }
+  .sales-cards-wrap { padding: 0 28px !important; }
+}
+
+@media (max-width: 767px) {
+  .layout-root { min-height: 100vh; }
+  .sidebar { display: none !important; }
+  .main-content {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .sales-table { display: none !important; }
+  .sales-cards { display: flex !important; }
+}
