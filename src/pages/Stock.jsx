@@ -21,7 +21,15 @@ export default function Stock() {
   const [products, setProducts] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [query, setQuery] = useState('');
+  // The list filters on this, not `query`, so it rebuilds once after the user
+  // pauses typing instead of on every keystroke (see Thumb for why churn matters).
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeCat, setActiveCat] = useState('All');
+
+  useEffect(() => {
+    const t = setTimeout(() => setSearchTerm(query), 250);
+    return () => clearTimeout(t);
+  }, [query]);
   const [modal, setModal] = useState(null); // { mode: 'add'|'edit', product? }
   const [saleTarget, setSaleTarget] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -40,14 +48,14 @@ export default function Stock() {
     () =>
       products.filter((p) => {
         const matchCat = activeCat === 'All' || p.category === activeCat;
-        const q = query.trim().toLowerCase();
+        const q = searchTerm.trim().toLowerCase();
         const matchQ =
           !q ||
           p.name.toLowerCase().includes(q) ||
           (p.code || '').toLowerCase().includes(q);
         return matchCat && matchQ;
       }),
-    [products, query, activeCat]
+    [products, searchTerm, activeCat]
   );
 
   const stats = useMemo(() => {
@@ -182,7 +190,7 @@ export default function Stock() {
             onChange={(e) => setQuery(e.target.value)}
           />
           {query && (
-            <button style={S.clearBtn} onClick={() => setQuery('')}>
+            <button style={S.clearBtn} onClick={() => { setQuery(''); setSearchTerm(''); }}>
               <X size={16} />
             </button>
           )}
@@ -286,14 +294,35 @@ function StatCard({ icon, label, value, wide, alert }) {
   );
 }
 
+// iOS WebKit has been seen painting the photo that last occupied a screen
+// position onto a newly inserted card (e.g. while search results churn).
+// Keeping the image invisible until *its own* load event fires means the worst
+// case is a briefly empty square, never another product's photo. Lazy loading
+// keeps hundreds of 800px photos from being decoded at once.
+function Thumb({ src }) {
+  const [state, setState] = useState('loading'); // loading | loaded | error
+  if (state === 'error') return <Package size={24} style={{ color: C.line }} />;
+  return (
+    <img
+      src={src}
+      alt=""
+      loading="lazy"
+      onLoad={() => setState('loaded')}
+      onError={() => setState('error')}
+      style={{ ...S.thumbImg, opacity: state === 'loaded' ? 1 : 0 }}
+    />
+  );
+}
+
 function ProductCard({ product: p, onDecrease, onIncrease, onEdit, onDelete }) {
   const low = p.qty > 0 && p.qty <= LOW_STOCK_THRESHOLD;
   const out = p.qty === 0;
   return (
     <article style={S.card}>
       <div style={S.thumb}>
+        {/* Keyed by URL so the loaded flag resets whenever the photo changes. */}
         {p.image
-          ? <img src={p.image} alt="" style={S.thumbImg} />
+          ? <Thumb key={p.image} src={p.image} />
           : <Package size={24} style={{ color: C.line }} />
         }
       </div>
